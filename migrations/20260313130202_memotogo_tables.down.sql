@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS meetings;
+DROP TABLE IF EXISTS users;
+
+DROP FUNCTION IF EXISTS meetings_search_update;
