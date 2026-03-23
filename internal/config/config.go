@@ -4,11 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/joho/godotenv"
 	"github.com/theluckymadman/memotogo/internal/repository"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
@@ -28,6 +30,8 @@ type Config struct {
 	SaluteAuthKey                    string                `env:"SALUTE_AUTH_KEY"`
 	SaluteScope                      string                `env:"SALUTE_SCOPE"`
 	SaluteOAuthRefreshTokenBeforeExp time.Duration         `env:"SALUTE_REFRESH_TOKEN_BEFORE"`
+	LLMSVCSettingsFile               string                `yaml:"LLM_SVC_SETTINGS_FILE"`
+	LLMSVSSettings                   LLMSVSSettings
 }
 
 func NewConfig() *Config {
@@ -40,10 +44,11 @@ func NewConfig() *Config {
 		GigaChatOAuthURL:                 "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
 		GigaChatScope:                    "GIGACHAT_API_PERS",
 		GigaOAuthRefreshTokenBeforeExp:   1 * time.Minute,
-		SaluteURL:                        "https://smartspeech.sber.ru/rest/v1/speech:recognize",
+		SaluteURL:                        "https://smartspeech.sber.ru/rest/v1",
 		SaluteOAuthURL:                   "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
 		SaluteOAuthRefreshTokenBeforeExp: 1 * time.Minute,
 		SaluteScope:                      "SALUTE_SPEECH_PERS",
+		LLMSVCSettingsFile:               "llmsvcsettings.yaml",
 	}
 	err := godotenv.Load()
 	if err != nil {
@@ -80,6 +85,8 @@ func NewConfig() *Config {
 	var saluteRefreshTokenBeforeExp int64 = int64(cfg.SaluteOAuthRefreshTokenBeforeExp.Seconds())
 	flag.Int64Var(&saluteRefreshTokenBeforeExp, "s-token-upd-before", saluteRefreshTokenBeforeExp, "refresh token before it exipres time in sec")
 
+	flag.StringVar(&cfg.LLMSVCSettingsFile, "llm-cfg", cfg.LLMSVCSettingsFile, "llm service settings yaml file")
+
 	var httpTimeout int64 = int64(cfg.HTTPTimeout.Seconds())
 	flag.Int64Var(&httpTimeout, "t", httpTimeout, "http request timeout in sec")
 
@@ -96,6 +103,12 @@ func NewConfig() *Config {
 	if err := cfg.Validate(); err != nil {
 		log.Fatalf("config validation failed: %v", err)
 	}
+
+	llm := LLMSVSSettings{}
+	if err = llm.LoadYaml(cfg.LLMSVCSettingsFile); err != nil {
+		log.Fatalf("LLM service load config: %v", err)
+	}
+	cfg.LLMSVSSettings = llm
 
 	return &cfg
 }
@@ -117,5 +130,23 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("SALUTE_SCOPE is required")
 	}
 
+	return nil
+}
+
+type LLMSVSSettings struct {
+	VoiceAssistSystemPrompt string `yaml:"VoiceAssistSystemPrompt"`
+	ChatAssitSystemPropmpt  string `yaml:"ChatAssitSystemPropmpt"`
+}
+
+func (l *LLMSVSSettings) LoadYaml(filePath string) error {
+	file, err := os.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("read file %w", err)
+	}
+
+	err = yaml.Unmarshal(file, &l)
+	if err != nil {
+		return fmt.Errorf("unmarshal file %w", err)
+	}
 	return nil
 }

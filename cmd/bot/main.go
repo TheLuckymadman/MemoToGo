@@ -18,6 +18,7 @@ import (
 	"github.com/theluckymadman/memotogo/internal/config"
 	"github.com/theluckymadman/memotogo/internal/deps"
 	"github.com/theluckymadman/memotogo/internal/handler"
+	"github.com/theluckymadman/memotogo/internal/llm"
 	"github.com/theluckymadman/memotogo/internal/middleware"
 	"github.com/theluckymadman/memotogo/internal/model"
 	"github.com/theluckymadman/memotogo/internal/queue"
@@ -80,7 +81,8 @@ func run() error {
 	)
 
 	q := queue.NewQueue(5)
-	h := handler.NewHandler(deps, q, bot, userRepo, meetRepo)
+	llmSvc := llm.NewLLMService(giga, deps)
+	h := handler.NewHandler(deps, q, bot, llmSvc, userRepo, meetRepo)
 	m := middleware.NewMiddleware(userRepo, deps)
 	bot.Handle("/start", h.Start)
 	bot.Handle(telebot.OnText, h.OnText, m.Auth)
@@ -89,6 +91,7 @@ func run() error {
 	bot.Handle("/find", h.OnFind, m.Auth)
 	bot.Handle("/list", h.OnList, m.Auth)
 	bot.Handle("/get", h.OnGet, m.Auth)
+	bot.Handle("/chat", h.OnText, m.Auth)
 	go bot.Start()
 
 	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

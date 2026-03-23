@@ -10,7 +10,6 @@ import (
 
 	"github.com/theluckymadman/memotogo/internal/client/oauth"
 	"github.com/theluckymadman/memotogo/internal/deps"
-	"github.com/theluckymadman/memotogo/internal/llm"
 	"go.uber.org/zap"
 )
 
@@ -25,20 +24,25 @@ func NewGigaChat(url string, model string, oauth *oauth.OAuth, deps *deps.Deps) 
 	return &GigaChat{URL: url, Model: model, Oauth: oauth, deps: deps}
 }
 
-func (g *GigaChat) Chat(ctx context.Context, messages []llm.Message, tools []llm.Tool) (*llm.ChatResponse, error) {
+func (g *GigaChat) Chat(ctx context.Context, messages []ReqMessage, funcs []Function) (*ChatResponse, error) {
 	logger := g.deps.Logger
-	logger.Info("GigaChat.Call is statring")
+	logger.Info("GigaChat.Chat")
 
 	token, err := g.Oauth.GetToken(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("GigaChat.Chat: get token: %w", err)
 	}
 
-	chatReq := llm.ChatRequest{
+	chatReq := ChatRequest{
 		Model:          g.Model,
 		Messages:       messages,
 		Stream:         false,
 		UpdateInterval: 0,
+	}
+
+	if len(funcs) > 0 {
+		logger.Info("GigaChat.Chat: add tools", zap.Any("tools", funcs))
+		chatReq.Functions = funcs
 	}
 
 	var reqBody bytes.Buffer
@@ -47,6 +51,9 @@ func (g *GigaChat) Chat(ctx context.Context, messages []llm.Message, tools []llm
 	if err != nil {
 		return nil, fmt.Errorf("GigaChat.Chat: encode body: %w", err)
 	}
+
+	logger.Info("GigaChat.Chat: prepared request to LLM", zap.String("body", reqBody.String()))
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, g.URL+"/chat/completions", &reqBody)
 	if err != nil {
 		return nil, fmt.Errorf("GigaChat.Chat: create request: %w", err)
@@ -62,7 +69,7 @@ func (g *GigaChat) Chat(ctx context.Context, messages []llm.Message, tools []llm
 	defer resp.Body.Close()
 
 	respBody, _ := io.ReadAll(resp.Body)
-	logger.Info("GigaChat", zap.String("body", string(respBody)))
+	logger.Info("GigaChat response", zap.String("body", string(respBody)))
 
 	if resp.StatusCode != http.StatusOK {
 		respBody, _ = io.ReadAll(resp.Body)
@@ -70,7 +77,7 @@ func (g *GigaChat) Chat(ctx context.Context, messages []llm.Message, tools []llm
 		return nil, fmt.Errorf("GigaChat.Chat: status %d: %s", resp.StatusCode, respBody)
 	}
 
-	var chatResp llm.ChatResponse
+	var chatResp ChatResponse
 	if err := json.Unmarshal(respBody, &chatResp); err != nil {
 		return nil, fmt.Errorf("decode: %w", err)
 	}
