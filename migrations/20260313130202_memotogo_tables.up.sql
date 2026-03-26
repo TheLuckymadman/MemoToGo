@@ -15,7 +15,6 @@ CREATE TABLE meetings (
   duration integer DEFAULT 0,
   transcription text,
   summary text,
-  emotions jsonb,
   topics jsonb,
   search_vector_en tsvector,
   search_vector_ru tsvector,
