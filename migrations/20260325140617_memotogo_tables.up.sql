@@ -12,8 +12,8 @@ CREATE TABLE transcription_tasks (
   summary_created timestamp,
   created_at timestamp DEFAULT now(),
   updated_at timestamp DEFAULT now(),
-  meeting_id bigint NOT NULL REFERENCES meetings(id)
+  meeting_id bigint REFERENCES meetings(id)
 );
 
-CREATE_INDEX idx_transcription_tasks_transcription_status ON transcription_tasks(transcription_status);
-CREATE_INDEX idx_transcription_tasks_task_status ON transcription_tasks(task_status);
+CREATE INDEX idx_transcription_tasks_transcription_status ON transcription_tasks(transcription_status);
+CREATE INDEX idx_transcription_tasks_task_status ON transcription_tasks(task_status);

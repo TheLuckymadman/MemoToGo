@@ -39,7 +39,7 @@ func (h *Handler) OnText(c telebot.Context) error {
 	errMsg := h.deps.ErrMsg
 	log.Printf("user info: %v", c.Sender())
 
-	res, err := h.llmSvc.Chat(context.Background(), c.Text())
+	res, err := h.llmSvc.Chat(context.Background(), c.Sender().ID, c.Sender().FirstName, c.Text())
 	if err != nil {
 		logger.Error(
 			"Handler.OnText: get file from server",

@@ -31,6 +31,7 @@ type Config struct {
 	SaluteScope                      string                `env:"SALUTE_SCOPE"`
 	SaluteOAuthRefreshTokenBeforeExp time.Duration         `env:"SALUTE_REFRESH_TOKEN_BEFORE"`
 	LLMSVCSettingsFile               string                `yaml:"LLM_SVC_SETTINGS_FILE"`
+	RunWorkersInterval               time.Duration         `env:"RUN_WORKER_INTERVAL"`
 	LLMSVSSettings                   LLMSVSSettings
 }
 
@@ -48,6 +49,7 @@ func NewConfig() *Config {
 		SaluteOAuthURL:                   "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
 		SaluteOAuthRefreshTokenBeforeExp: 1 * time.Minute,
 		SaluteScope:                      "SALUTE_SPEECH_PERS",
+		RunWorkersInterval:               10 * time.Second,
 		LLMSVCSettingsFile:               "llmsvcsettings.yaml",
 	}
 	err := godotenv.Load()

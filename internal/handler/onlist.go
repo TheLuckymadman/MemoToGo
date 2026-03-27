@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/theluckymadman/memotogo/internal/utils"
 	"go.uber.org/zap"
 	"gopkg.in/telebot.v3"
 )
@@ -39,13 +40,11 @@ func (h *Handler) OnList(c telebot.Context) error {
 				`%-10s: %v
 %-10s: %v
 %-10s: %v
-%s
 ----------------------------------------------
 `,
 				"ID", meet.ID,
 				"Data", meet.Date,
 				"Duration", fmt.Sprintf("%d sec", meet.Duration),
-				meet.Summary,
 			)
 		}
 		logger.Info(
@@ -55,5 +54,15 @@ func (h *Handler) OnList(c telebot.Context) error {
 			zap.Int("Meeting count", len(meets)),
 		)
 	}
-	return c.Send(resp)
+
+	chunks := utils.SplitText(resp, 400)
+
+	for _, chunk := range chunks {
+		if err := c.Send(chunk); err != nil {
+			logger.Error("failed to send chunk", zap.Error(err))
+			return err
+		}
+	}
+
+	return nil
 }

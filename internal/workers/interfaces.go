@@ -3,18 +3,17 @@ package workers
 import (
 	"context"
 
+	"github.com/theluckymadman/memotogo/internal/llm/llmtype"
 	"github.com/theluckymadman/memotogo/internal/model"
-	"github.com/theluckymadman/memotogo/internal/transcription"
 )
 
 type Transcriptor interface {
-	GetTranscriptionSync(ctx context.Context, audio []byte) (*transcription.TranscriptionResponse, error)
-	UploadFile(ctx context.Context, audio []byte) (string, error)
-	NewTranscriptionTask(ctx context.Context, requestFileID string) (string, error)
-	GetTaskStatus(ctx context.Context, taskID string) (*transcription.GetTaskStatusResponse, error)
-	DownloadFile(ctx context.Context, responseFileID string) (transcription.DownloadResponse, error)
+	GetTranscriptionSync(ctx context.Context, audio []byte) (*model.Transcription, error)
+	CreateTask(ctx context.Context, audio []byte) (*model.TranscriptionTask, error)
+	GetTaskStatus(ctx context.Context, task model.TranscriptionTask) (*model.TranscriptionTask, error)
+	GetTranscription(ctx context.Context, task model.TranscriptionTask) (*model.Transcription, error)
 }
 
 type LLM interface {
-	Chat(ctx context.Context, messages []model.ReqMessage, tools []model.Function) (*model.ChatResponse, error)
+	Chat(ctx context.Context, messages []llmtype.Message, tools []llmtype.Tool) (*llmtype.ChatResponse, error)
 }

@@ -52,12 +52,19 @@ type Tool interface {
 }
 
 type JSONSchema struct {
-	Type       string              `json:"type"`
-	Properties map[string]Property `json:"properties"`
+	Type       string              `json:"type"` // "object", "array", "string", etc.
+	Properties map[string]Property `json:"properties,omitempty"`
 	Required   []string            `json:"required,omitempty"`
+
+	Items       *JSONSchema `json:"items,omitempty"` // for arrays
+	Enum        []string    `json:"enum,omitempty"`
+	Description string      `json:"description,omitempty"`
 }
 
 type Property struct {
 	Type        string `json:"type"`
 	Description string `json:"description,omitempty"`
+
+	Enum  []string    `json:"enum,omitempty"`
+	Items *JSONSchema `json:"items,omitempty"` // for arrays
 }

@@ -36,6 +36,10 @@ func (h *Handler) OnFind(c telebot.Context) error {
 	} else {
 		resp = "Here is the meetings I found:\n"
 		for _, meet := range meets {
+			var summary string
+			if meet.Summary != nil {
+				summary = *meet.Summary
+			}
 			resp += fmt.Sprintf(
 				`%-10s: %v
 %-10s: %v
@@ -46,7 +50,7 @@ func (h *Handler) OnFind(c telebot.Context) error {
 				"ID", meet.ID,
 				"Data", meet.Date,
 				"Duration", fmt.Sprintf("%d sec", meet.Duration),
-				meet.Summary,
+				summary,
 			)
 		}
 		logger.Info(

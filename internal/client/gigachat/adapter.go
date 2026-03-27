@@ -1,37 +1,36 @@
-package adapter
+package gigachat
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/theluckymadman/memotogo/internal/client/gigachat"
 	"github.com/theluckymadman/memotogo/internal/deps"
 	"github.com/theluckymadman/memotogo/internal/llm/llmtype"
 	"go.uber.org/zap"
 )
 
 type GigaChatAdapter struct {
-	giga *gigachat.GigaChat
+	giga *GigaChat
 	deps *deps.Deps
 }
 
-func NewGigaChatAdapter() *GigaChatAdapter {
-	return &GigaChatAdapter{}
+func NewGigaChatAdapter(giga *GigaChat, deps *deps.Deps) *GigaChatAdapter {
+	return &GigaChatAdapter{giga: giga, deps: deps}
 }
 
 func (a *GigaChatAdapter) Chat(ctx context.Context, messages []llmtype.Message, tools []llmtype.Tool) (*llmtype.ChatResponse, error) {
 	logger := a.deps.Logger
 	logger.Info("GigaChatAdapter.Chat")
 
-	var gigaMessages []gigachat.ReqMessage
+	var gigaMessages []ReqMessage
 	for _, m := range messages {
-		msg := gigachat.ReqMessage{
+		msg := ReqMessage{
 			Role:    m.Role,
 			Content: m.Content,
 		}
 
 		if m.ToolCall != nil {
-			msg.FunctionCall = &gigachat.FunctionCall{
+			msg.FunctionCall = &FunctionCall{
 				Name:      m.ToolCall.Name,
 				Arguments: m.ToolCall.Arguments,
 			}
@@ -86,19 +85,23 @@ func (a *GigaChatAdapter) Chat(ctx context.Context, messages []llmtype.Message, 
 	return res, nil
 }
 
-func ToGigaFunctions(tools []llmtype.Tool) []gigachat.Function {
-	var funcs []gigachat.Function
+func ToGigaFunctions(tools []llmtype.Tool) []Function {
+	var funcs []Function
+
+	if len(tools) == 0 {
+		return nil
+	}
 
 	for _, t := range tools {
-		funcs = append(funcs, gigachat.Function{
+		funcs = append(funcs, Function{
 			Name:        t.Name(),
 			Description: t.Description(),
-			Parameters: gigachat.JSONSchema{
+			Parameters: JSONSchema{
 				Type:       t.Parameters().Type,
 				Properties: convertProps(t.Parameters().Properties),
 				Required:   t.Parameters().Required,
 			},
-			ReturnParameters: gigachat.JSONSchema{
+			ReturnParameters: JSONSchema{
 				Type:       t.ReturnParameters().Type,
 				Properties: convertProps(t.ReturnParameters().Properties),
 			},
@@ -108,10 +111,10 @@ func ToGigaFunctions(tools []llmtype.Tool) []gigachat.Function {
 	return funcs
 }
 
-func convertProps(props map[string]llmtype.Property) map[string]gigachat.Property {
-	gigaProps := make(map[string]gigachat.Property)
+func convertProps(props map[string]llmtype.Property) map[string]Property {
+	gigaProps := make(map[string]Property)
 	for k, v := range props {
-		gigaProps[k] = gigachat.Property{
+		gigaProps[k] = Property{
 			Type:        v.Type,
 			Description: v.Description,
 		}

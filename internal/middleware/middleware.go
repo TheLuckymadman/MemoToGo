@@ -45,7 +45,7 @@ func (m *Middleware) Auth(next telebot.HandlerFunc) telebot.HandlerFunc {
 			)
 			return c.Send("Ups, we didn't find you among our users. Please type the command /start.")
 		}
-		logger.Warn(
+		logger.Info(
 			"Middleware.Auth: access allowed",
 			zap.Int64("User ID", c.Sender().ID),
 			zap.String("Usename", c.Sender().Username),

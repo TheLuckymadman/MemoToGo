@@ -75,7 +75,7 @@ func (h *Handler) OnAudio(c telebot.Context) error {
 		zap.String("Usename", c.Sender().Username),
 		zap.String("FileID", audioMsg.File.FileID),
 	)
-	c.Send("Awesome:) Wait a bit, I'll respond soon.")
+	//c.Send("Awesome:) Wait a bit, I'll respond soon.")
 	resp := <-rcvChan
 	logger.Info(
 		"Handler.onVoice: got respone from chan",

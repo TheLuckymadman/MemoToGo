@@ -6,161 +6,108 @@ import (
 	"fmt"
 
 	"github.com/theluckymadman/memotogo/internal/deps"
-	"github.com/theluckymadman/memotogo/internal/llm/adapter"
 	"github.com/theluckymadman/memotogo/internal/llm/llmtype"
 	"github.com/theluckymadman/memotogo/internal/llm/tool"
-	"github.com/theluckymadman/memotogo/internal/model"
 
 	"go.uber.org/zap"
 )
 
 type LLMService struct {
-	gigaAdapter  *adapter.GigaChatAdapter
+	llm          LLM
 	systemPrompt string
 	deps         *deps.Deps
-	state        []llmtype.Message
+	state        *State
 	toolRegistry tool.Registry
+	maxLLMIter   int
 }
 
-func NewLLMService(gigaAdapter *adapter.GigaChatAdapter, systemPrompt string, deps *deps.Deps) *LLMService {
-	return &LLMService{gigaAdapter: gigaAdapter, systemPrompt: systemPrompt, deps: deps}
+func NewLLMService(llm LLM, systemPrompt string, deps *deps.Deps, state *State, toolRegistry tool.Registry, maxLLMIter int) *LLMService {
+	return &LLMService{llm: llm, systemPrompt: systemPrompt, deps: deps, state: state, toolRegistry: toolRegistry, maxLLMIter: maxLLMIter}
 }
 
-func (l *LLMService) Chat(ctx context.Context, question string) (string, error) {
+func (l *LLMService) Chat(ctx context.Context, userID int64, userName string, question string) (string, error) {
 	logger := l.deps.Logger
 	logger.Info("LLMService.Chat", zap.String("User:", question))
 
-	toolList := []llmtype.Tool{
-		tool.ListMeeting{},
+	toolList := []llmtype.Tool{}
+	for _, t := range l.toolRegistry {
+		toolList = append(toolList, t)
+	}
+	finalSystemPrompt := fmt.Sprintf(`
+		%s
+		Information about a user: 
+		1) UserID is %d 
+		2) User name is %s \n
+		Use this information in the conversation, greetings and for calling the functions`, l.systemPrompt, userID, userName)
+	messages := []llmtype.Message{
+		{
+			Role:    "system",
+			Content: finalSystemPrompt,
+		},
+		{
+			Role:    "user",
+			Content: question,
+		},
 	}
 
-	for {
-		res, _ := l.gigaAdapter.Chat(
-			ctx,
-			[]llmtype.Message{
-				{
-					Role:    "system",
-					Content: l.systemPrompt,
-				},
-				{
-					Role:    "user",
-					Content: question,
-				},
-			},
-			toolList,
-		)
+	l.state.AddMessage(userID, messages)
+
+	var iterCnt int
+	for iterCnt < l.maxLLMIter {
+		res, err := l.llm.Chat(ctx, messages, toolList)
+		if err != nil {
+			logger.Error(
+				"LLMService.Chat LLM responds error",
+				zap.Int64("UserID", userID),
+				zap.Error(err),
+			)
+			return "", fmt.Errorf("LLMService.Chat LLM responds error: %w", err)
+		}
+
+		l.state.AddMessage(userID, []llmtype.Message{res.Choices[0].Message})
 
 		call := tool.ExtractToolCall(res)
 		if call == nil {
+			logger.Info(
+				"LLMService.Chat no tools are being called, LLM responds to user",
+				zap.Int64("UserID", userID),
+				zap.String("LLM response", res.Choices[0].Message.Content),
+				zap.Any("User state", l.state.store[userID]),
+			)
 			return res.Choices[0].Message.Content, nil
 		}
 
-		call.
-	}
-
-	res, err := l.gigaAdapter.Chat(
-		ctx,
-		[]llmtype.Message{
-			{
-				Role:    "system",
-				Content: l.systemPrompt,
-			},
-			{
-				Role:    "user",
-				Content: question,
-			},
-		},
-		toolList,
-	)
-	if err != nil {
-		logger.Error(
-			"LLMService.Chat: LLM respone",
-			zap.Error(err),
-		)
-		return "", fmt.Errorf("LLMService.Chat: giga response: %w", err)
-	}
-
-	logger.Info(
-		"LLMService.Answer: got respone from LLM",
-		zap.Any("Response", res),
-	)
-
-	fc := res.Choices[0].Message.ToolCall
-
-	for fc != nil && fc.Name != "" {
-		json.Unmarshal(fc.Arguments)
-
-		arg, ok := fc.Arguments["userID"].(string)
-		if !ok || arg == "" {
-			break
-		}
-		funcRes, _ := listMeeting.Call(ctx, arg)
-		funcResObj := map[string]string{
-			"result": funcRes,
-		}
-
-		funcResBytes, _ := json.Marshal(funcResObj)
-		res, err = l.giga.Chat(
-			ctx,
-			[]model.ReqMessage{
-				{
-					Role:    "system",
-					Content: l.systemPrompt,
-				},
-				{
-					Role:    "user",
-					Content: question,
-				},
-				{
-					Role:         "assistant",
-					Content:      res.Choices[0].Message.Content,
-					FunctionCall: res.Choices[0].Message.FunctionCall,
-				},
-				{
-					Role:    "function",
-					Content: string(funcResBytes),
-				},
-			},
-			[]model.Function{
-				{
-					Name:        listMeeting.Name(),
-					Description: listMeeting.Description(),
-					Parameters: model.JSONSchema{
-						Type:     "object",
-						Required: []string{"userID"},
-						Properties: map[string]model.Property{
-							"userID": {
-								Type:        "string",
-								Description: "Requires userID. If userID is unknown, ask the user before calling.",
-							},
-						},
-					},
-					ReturnParameters: model.JSONSchema{
-						Type: "object",
-						Properties: map[string]model.Property{
-							"result": {
-								Type:        "string",
-								Description: "Result of listing meetings in JSON Format",
-							},
-						},
-					},
-				},
-			},
-		)
-		if err != nil {
-			logger.Error(
-				"LLMService.Answer: get file from server",
-				zap.Error(err),
-			)
-			return "", fmt.Errorf("LLMService.Chat: giga response after tool calling: %w", err)
-		}
-
 		logger.Info(
-			"LLMService.Answer: got respone from LLM after tool calling",
-			zap.Any("Response", res),
+			"LLMService.Chat tool called",
+			zap.Int64("UserID", userID),
+			zap.String("LLM response", res.Choices[0].Message.Content),
+			zap.String("Tool name", call.Name),
+			zap.String("Tool args", string(call.Arguments)),
+			zap.Any("User state", l.state.store[userID]),
 		)
-		fc = res.Choices[0].Message.FunctionCall
-	}
 
-	return res.Choices[0].Message.Content, nil
+		tool, ok := l.toolRegistry[call.Name]
+		if !ok {
+			return "", fmt.Errorf("tool not found: %s", call.Name)
+		}
+		callRes, err := tool.Call(ctx, call.Arguments)
+		if err != nil {
+			return "", fmt.Errorf("tool execution: %w ", err)
+		}
+		callResObj := map[string]any{
+			"result": callRes,
+		}
+		resOut, err := json.Marshal(callResObj)
+		if err != nil {
+			return "", fmt.Errorf("tool result marshalling: %w ", err)
+		}
+		messages = append(messages,
+			res.Choices[0].Message,
+			llmtype.Message{
+				Role:    "function",
+				Content: string(resOut),
+			})
+		l.state.AddMessage(userID, messages)
+	}
+	return "", fmt.Errorf("iteration limit reached %d", iterCnt)
 }

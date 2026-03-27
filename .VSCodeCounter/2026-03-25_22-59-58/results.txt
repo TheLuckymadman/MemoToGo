@@ -1,0 +1,113 @@
+Date : 2026-03-25 22:59:58
+Directory : /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo
+Total : 58 files,  4259 codes, 38 comments, 519 blanks, all 4816 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| Go               |         48 |      2,992 |         36 |        491 |      3,519 |
+| Go Checksum File |          1 |      1,102 |          0 |          1 |      1,103 |
+| MS SQL           |          5 |         61 |          1 |         10 |         72 |
+| YAML             |          2 |         53 |          1 |         12 |         66 |
+| Go Module File   |          1 |         50 |          0 |          5 |         55 |
+| Shell Script     |          1 |          1 |          0 |          0 |          1 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                            | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                               |         58 |      4,259 |         38 |        519 |      4,816 |
+| . (Files)                                                                                                       |          3 |      1,189 |          0 |         18 |      1,207 |
+| cmd                                                                                                             |          1 |        116 |          0 |         20 |        136 |
+| cmd/bot                                                                                                         |          1 |        116 |          0 |         20 |        136 |
+| deploy                                                                                                          |          1 |         16 |          1 |          0 |         17 |
+| internal                                                                                                        |         47 |      2,876 |         36 |        471 |      3,383 |
+| internal/audio                                                                                                  |          1 |         66 |          0 |         19 |         85 |
+| internal/client                                                                                                 |         12 |        724 |          2 |        122 |        848 |
+| internal/client (Files)                                                                                         |          2 |         35 |          0 |          8 |         43 |
+| internal/client/gigachat                                                                                        |          2 |        145 |          1 |         32 |        178 |
+| internal/client/oauth                                                                                           |          2 |         99 |          0 |         14 |        113 |
+| internal/client/salute                                                                                          |          6 |        445 |          1 |         68 |        514 |
+| internal/config                                                                                                 |          1 |        125 |          2 |         26 |        153 |
+| internal/deps                                                                                                   |          1 |         13 |          0 |          5 |         18 |
+| internal/handler                                                                                                |          7 |        440 |          4 |         46 |        490 |
+| internal/llm                                                                                                    |         10 |        574 |          1 |        118 |        693 |
+| internal/llm (Files)                                                                                            |          4 |        195 |          0 |         44 |        239 |
+| internal/llm/adapter                                                                                            |          1 |        100 |          0 |         21 |        121 |
+| internal/llm/llmtype                                                                                            |          1 |         57 |          1 |         13 |         71 |
+| internal/llm/tool                                                                                               |          4 |        222 |          0 |         40 |        262 |
+| internal/middleware                                                                                             |          1 |         50 |          0 |          6 |         56 |
+| internal/model                                                                                                  |          3 |         75 |          0 |         14 |         89 |
+| internal/queue                                                                                                  |          1 |         16 |          0 |          4 |         20 |
+| internal/repository                                                                                             |          4 |        437 |          3 |         63 |        503 |
+| internal/utils                                                                                                  |          1 |         15 |          0 |          4 |         19 |
+| internal/workers                                                                                                |          5 |        341 |         24 |         44 |        409 |
+| migrations                                                                                                      |          6 |         62 |          1 |         10 |         73 |
++-----------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                                                                        | language         | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/cmd/bot/main.go                                    | Go               |        116 |          0 |         20 |        136 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/deploy/docker-compose_psql.yaml                    | YAML             |         16 |          1 |          0 |         17 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/go.mod                                             | Go Module File   |         50 |          0 |          5 |         55 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/go.sum                                             | Go Checksum File |      1,102 |          0 |          1 |      1,103 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/audio/audio.go                            | Go               |         66 |          0 |         19 |         85 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/gigachat/gigachat.go               | Go               |         71 |          0 |         18 |         89 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/gigachat/type.go                   | Go               |         74 |          1 |         14 |         89 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/http.go                            | Go               |         18 |          0 |          3 |         21 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/oauth/oauth.go                     | Go               |         76 |          0 |          8 |         84 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/oauth/type.go                      | Go               |         23 |          0 |          6 |         29 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/salute/adapter.go                  | Go               |          1 |          0 |          2 |          3 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/salute/async_transcriptor.go       | Go               |        239 |          1 |         28 |        268 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/salute/async_types.go              | Go               |        107 |          0 |         21 |        128 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/salute/salute.go                   | Go               |         25 |          0 |          5 |         30 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/salute/sync_transcriptor.go        | Go               |         54 |          0 |          8 |         62 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/salute/sync_types.go               | Go               |         19 |          0 |          4 |         23 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/client/telegram.go                        | Go               |         17 |          0 |          5 |         22 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/config/config.go                          | Go               |        125 |          2 |         26 |        153 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/deps/deps.go                              | Go               |         13 |          0 |          5 |         18 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/handler.go                        | Go               |         47 |          0 |          7 |         54 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/onaudio.go                        | Go               |         82 |          0 |          6 |         88 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/onfind.go                         | Go               |         54 |          1 |          6 |         61 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/onget.go                          | Go               |         65 |          1 |          6 |         72 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/onlist.go                         | Go               |         58 |          2 |          9 |         69 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/onvoice.go                        | Go               |         67 |          0 |          6 |         73 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/handler/start.go                          | Go               |         67 |          0 |          6 |         73 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/adapter/gigachat.go                   | Go               |        100 |          0 |         21 |        121 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/interface.go                          | Go               |          8 |          0 |          5 |         13 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/llm.go                                | Go               |        100 |          0 |         14 |        114 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/llmtype/llmtype.go                    | Go               |         57 |          1 |         13 |         71 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/prompts.go                            | Go               |         33 |          0 |         15 |         48 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/state.go                              | Go               |         54 |          0 |         10 |         64 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/tool/extractor.go                     | Go               |         12 |          0 |          4 |         16 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/tool/get_meeting.go                   | Go               |        103 |          0 |         15 |        118 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/tool/list_meetings.go                 | Go               |         93 |          0 |         15 |        108 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/llm/tool/registry.go                      | Go               |         14 |          0 |          6 |         20 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/middleware/middleware.go                  | Go               |         50 |          0 |          6 |         56 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/model/meeting.go                          | Go               |         37 |          0 |          6 |         43 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/model/transcription.go                    | Go               |         28 |          0 |          5 |         33 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/model/user.go                             | Go               |         10 |          0 |          3 |         13 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/queue/queue.go                            | Go               |         16 |          0 |          4 |         20 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/repository/generic.go                     | Go               |        109 |          3 |         17 |        129 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/repository/pgstorage.go                   | Go               |        105 |          0 |         13 |        118 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/repository/transcriptions.go              | Go               |        185 |          0 |         26 |        211 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/repository/type.go                        | Go               |         38 |          0 |          7 |         45 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/utils/message.go                          | Go               |         15 |          0 |          4 |         19 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/workers/creator.go                        | Go               |         71 |          0 |         10 |         81 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/workers/executor.go                       | Go               |        121 |          0 |         13 |        134 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/workers/interfaces.go                     | Go               |         15 |          0 |          5 |         20 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/workers/notifier.go                       | Go               |         69 |          0 |          8 |         77 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/internal/workers/user_notifier.go                  | Go               |         65 |         24 |          8 |         97 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/llmsvcsettings.yaml                                | YAML             |         37 |          0 |         12 |         49 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/migrations/0_memotogo_tables.down.sql              | MS SQL           |          3 |          0 |          0 |          3 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/migrations/20260313130202_memotogo_tables.down.sql | MS SQL           |          3 |          0 |          1 |          4 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/migrations/20260313130202_memotogo_tables.up.sql   | MS SQL           |         39 |          1 |          8 |         48 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/migrations/20260325140617_memotogo_tables.down.sql | MS SQL           |          1 |          0 |          0 |          1 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/migrations/20260325140617_memotogo_tables.up.sql   | MS SQL           |         15 |          0 |          1 |         16 |
+| /home/kirill/Yandex.Disk/myProjects/go/ya-practicum/memotogo/migrations/migrate.sh                              | Shell Script     |          1 |          0 |          0 |          1 |
+| Total                                                                                                           |                  |      4,259 |         38 |        519 |      4,816 |
++-----------------------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
