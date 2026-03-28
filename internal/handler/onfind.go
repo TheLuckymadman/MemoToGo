@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/theluckymadman/memotogo/internal/utils"
 	"go.uber.org/zap"
 	"gopkg.in/telebot.v3"
 )
@@ -53,12 +54,22 @@ func (h *Handler) OnFind(c telebot.Context) error {
 				summary,
 			)
 		}
-		logger.Info(
-			"Handler.onFind: searchresult",
-			zap.Int64("User ID", c.Sender().ID),
-			zap.String("Usename", c.Sender().Username),
-			zap.Int("Meeting count", len(meets)),
-		)
 	}
-	return c.Send(resp)
+
+	logger.Info(
+		"Handler.onFind: searchresult",
+		zap.Int64("User ID", c.Sender().ID),
+		zap.String("Usename", c.Sender().Username),
+		zap.Int("Meeting count", len(meets)),
+	)
+
+	chunks := utils.SplitText(resp, 400)
+
+	for _, chunk := range chunks {
+		if err := c.Send(chunk); err != nil {
+			logger.Error("failed to send chunk", zap.Error(err))
+			return err
+		}
+	}
+	return nil
 }

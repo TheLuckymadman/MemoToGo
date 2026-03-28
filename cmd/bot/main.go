@@ -58,7 +58,7 @@ func run() error {
 	getMeeting := tool.NewGetMeeting(meetRepo, deps)
 	toolRegistry.Add(listMeeting)
 	toolRegistry.Add(getMeeting)
-	userState := llm.NewState(15, 5, deps)
+	userState := llm.NewState(20, 5, deps)
 	llmSvc := llm.NewLLMService(gigaAdapter, cfg.LLMSVSSettings.ChatAssitSystemPropmpt, deps, userState, toolRegistry, 5)
 
 	jobQueue := queue.NewQueue(5)
@@ -85,11 +85,17 @@ func run() error {
 	go bot.Start()
 
 	taskCreator := workers.NewTaskCreator(jobQueue, saluteAdapter, meetRepo, transcriptRepo, deps)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		taskCreator.Start(signalCtx)
-	}()
+
+	var creatorWg sync.WaitGroup
+	for id := range cfg.ParallelTaskCnt {
+		wg.Add(1)
+		creatorWg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			defer creatorWg.Done()
+			taskCreator.Start(signalCtx, id)
+		}(id)
+	}
 
 	notifier := workers.NewNotifier(bot, deps, userRepo)
 	wg.Add(1)
@@ -98,14 +104,15 @@ func run() error {
 		notifier.Start(signalCtx)
 	}()
 
-	taskExecutor := workers.NewTaskExecutor(cfg.RunWorkersInterval, saluteAdapter, meetRepo, transcriptRepo, deps)
+	taskExecutor := workers.NewTaskExecutor(cfg.ParallelTaskCnt, cfg.RunWorkersInterval, saluteAdapter, meetRepo, transcriptRepo, deps)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		taskExecutor.Start(signalCtx)
 	}()
 
-	summarizer := workers.NewSummarizer(cfg.RunWorkersInterval, bot, gigaAdapter, cfg.LLMSVSSettings.VoiceAssistSystemPrompt, meetRepo, summaryRepo, deps)
+	//Only 1 parallel request is allowed in the free tier; it is temporarily hard-coded.
+	summarizer := workers.NewSummarizer(1, cfg.RunWorkersInterval, bot, gigaAdapter, cfg.LLMSVSSettings.VoiceAssistSystemPrompt, meetRepo, summaryRepo, deps)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -115,8 +122,8 @@ func run() error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		<-signalCtx.Done()
-		logger.Info("graceful shutdown initiated")
+		creatorWg.Wait()
+		logger.Info("shutdown signal received", zap.Error(signalCtx.Err()))
 		bot.Stop()
 		logger.Info("bot stopped gracefully")
 	}()

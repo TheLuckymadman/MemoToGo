@@ -22,12 +22,13 @@ func (r *TranscriptionTaskRepo) InsertTask(
 	transcriptStatus string,
 	taskStatus string,
 	chatID int64,
+	duration int,
 ) error {
 	errPrefix := "TranscriptionTaskRepo.CreateTask:"
 	_, err := r.db.ExecContext(ctx, `
-	INSERT INTO transcription_tasks (transcription_task_id, transcription_status, task_status, chat_id)
-	VALUES ($1, $2, $3)
-	`, transcriptTaskID, transcriptStatus, taskStatus, chatID)
+	INSERT INTO transcription_tasks (transcription_task_id, transcription_status, task_status, chat_id, duration)
+	VALUES ($1, $2, $3, $4, $5)
+	`, transcriptTaskID, transcriptStatus, taskStatus, chatID, duration)
 	if err != nil {
 		return fmt.Errorf("%s DB query: %w", errPrefix, err)
 	}
@@ -218,7 +219,7 @@ func (r *TranscriptionTaskRepo) UpdSuccessStatusByID(
 	INSERT INTO meetings (duration, transcription, user_id, topics)
 	VALUES ($1, $2, $3, $4)
 	RETURNING id
-	`, duration, transcription, chatID, "{}").Scan(&meetingID)
+	`, duration, transcription, chatID, "[]").Scan(&meetingID)
 	if err != nil {
 		err = fmt.Errorf("%s DB query: %w", errPrefix, err)
 		return

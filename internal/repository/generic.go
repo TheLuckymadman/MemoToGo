@@ -108,14 +108,17 @@ func (s *Storage[E]) Search(ctx context.Context, tsQuery string, limit int) ([]E
 		err = s.db.SelectContext(ctx, &entities, query, tsQuery)
 	} else {
 		query = fmt.Sprintf(`
-		SELECT *
-		FROM %s
-		WHERE search_vector_en @@ to_tsquery('english', $1) 
-			OR search_vector_ru @@ to_tsquery('russian', $1) 
-		ORDER BY GREATEST(
-			ts_rank(search_vector_en, to_tsquery('english', $1)),
-			ts_rank(search_vector_ru, to_tsquery('russian', $1))
-		) DESC
+		SELECT DISTINCT * 
+		FROM (
+			SELECT *
+			FROM %s
+			WHERE search_vector_en @@ to_tsquery('english', $1) 
+				OR search_vector_ru @@ to_tsquery('russian', $1) 
+			ORDER BY GREATEST(
+				ts_rank(search_vector_en, to_tsquery('english', $1)),
+				ts_rank(search_vector_ru, to_tsquery('russian', $1))
+			) DESC
+		)
 		`, s.table)
 		err = s.db.SelectContext(ctx, &entities, query, tsQuery)
 	}

@@ -8,7 +8,6 @@ import (
 	"github.com/theluckymadman/memotogo/internal/llm"
 	"github.com/theluckymadman/memotogo/internal/model"
 	"github.com/theluckymadman/memotogo/internal/queue"
-	"github.com/theluckymadman/memotogo/internal/repository"
 	"go.uber.org/zap"
 	"gopkg.in/telebot.v3"
 )
@@ -18,8 +17,8 @@ type Handler struct {
 	deps     *deps.Deps
 	bot      *telebot.Bot
 	llmSvc   *llm.LLMService
-	userRepo *repository.Storage[model.User]
-	meetRepo *repository.Storage[model.Meeting]
+	userRepo Repository[model.User]
+	meetRepo Repository[model.Meeting]
 }
 
 func NewHandler(
@@ -27,8 +26,8 @@ func NewHandler(
 	queue *queue.Queue,
 	bot *telebot.Bot,
 	llmSvc *llm.LLMService,
-	userRepo *repository.Storage[model.User],
-	meetRepo *repository.Storage[model.Meeting],
+	userRepo Repository[model.User],
+	meetRepo Repository[model.Meeting],
 ) *Handler {
 	return &Handler{queue: queue, deps: deps, bot: bot, llmSvc: llmSvc, userRepo: userRepo, meetRepo: meetRepo}
 }

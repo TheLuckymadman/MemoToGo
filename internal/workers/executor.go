@@ -13,6 +13,7 @@ import (
 )
 
 type TaskExecutor struct {
+	parallelTaskCnt     int
 	runInterval         time.Duration
 	transcriptor        Transcriptor
 	meetsRepo           *repository.Storage[model.Meeting]
@@ -21,6 +22,7 @@ type TaskExecutor struct {
 }
 
 func NewTaskExecutor(
+	parallelTaskCnt int,
 	runInterval time.Duration,
 	transcriptor Transcriptor,
 	meetsRepo *repository.Storage[model.Meeting],
@@ -28,6 +30,7 @@ func NewTaskExecutor(
 	deps *deps.Deps,
 ) *TaskExecutor {
 	return &TaskExecutor{
+		parallelTaskCnt:     parallelTaskCnt,
 		runInterval:         runInterval,
 		transcriptor:        transcriptor,
 		meetsRepo:           meetsRepo,
@@ -53,7 +56,7 @@ func (t *TaskExecutor) Start(doneCtx context.Context) {
 		}
 
 		var wg sync.WaitGroup
-		reqLimit := make(chan int, 10)
+		reqLimit := make(chan int, t.parallelTaskCnt)
 		for _, taskID := range taskIDs {
 			wg.Add(1)
 			go func() {

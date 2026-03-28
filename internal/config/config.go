@@ -32,6 +32,7 @@ type Config struct {
 	SaluteOAuthRefreshTokenBeforeExp time.Duration         `env:"SALUTE_REFRESH_TOKEN_BEFORE"`
 	LLMSVCSettingsFile               string                `yaml:"LLM_SVC_SETTINGS_FILE"`
 	RunWorkersInterval               time.Duration         `env:"RUN_WORKER_INTERVAL"`
+	ParallelTaskCnt                  int                   `env:"WORKERS_COUNT"`
 	LLMSVSSettings                   LLMSVSSettings
 }
 
@@ -41,7 +42,7 @@ func NewConfig() *Config {
 		DBMigrationDir:                   "migrations",
 		HTTPTimeout:                      30 * time.Second,
 		GigaChatURL:                      "https://gigachat.devices.sberbank.ru/api/v1",
-		GigaChatModel:                    "GigaChat-2-Pro",
+		GigaChatModel:                    "GigaChat-2",
 		GigaChatOAuthURL:                 "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
 		GigaChatScope:                    "GIGACHAT_API_PERS",
 		GigaOAuthRefreshTokenBeforeExp:   1 * time.Minute,
@@ -50,6 +51,7 @@ func NewConfig() *Config {
 		SaluteOAuthRefreshTokenBeforeExp: 1 * time.Minute,
 		SaluteScope:                      "SALUTE_SPEECH_PERS",
 		RunWorkersInterval:               10 * time.Second,
+		ParallelTaskCnt:                  5,
 		LLMSVCSettingsFile:               "llmsvcsettings.yaml",
 	}
 	err := godotenv.Load()

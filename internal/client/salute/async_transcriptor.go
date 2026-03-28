@@ -154,7 +154,7 @@ func (s *Salute) NewTranscriptionTask(ctx context.Context, requestFileID string)
 		bodyStr = bodyStr[:100]
 	}
 	logger.Info(
-		"Salute.NewTranscriptionTaskadFile: result",
+		"Salute.NewTranscriptionTaskFile: result",
 		zap.Int("status", res.StatusCode),
 		zap.String("body", bodyStr),
 		zap.Any("response", transcriptionNewTask),

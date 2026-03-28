@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/theluckymadman/memotogo/internal/deps"
 	"github.com/theluckymadman/memotogo/internal/llm/llmtype"
@@ -38,7 +39,8 @@ func (l *LLMService) Chat(ctx context.Context, userID int64, userName string, qu
 		Information about a user: 
 		1) UserID is %d 
 		2) User name is %s \n
-		Use this information in the conversation, greetings and for calling the functions`, l.systemPrompt, userID, userName)
+		3) Today's date is %v
+		Use this information in the conversation, greetings and for calling the functions`, l.systemPrompt, userID, userName, time.Now())
 	messages := []llmtype.Message{
 		{
 			Role:    "system",
