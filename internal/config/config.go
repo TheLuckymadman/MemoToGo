@@ -33,6 +33,7 @@ type Config struct {
 	LLMSVCSettingsFile               string                `yaml:"LLM_SVC_SETTINGS_FILE"`
 	RunWorkersInterval               time.Duration         `env:"RUN_WORKER_INTERVAL"`
 	ParallelTaskCnt                  int                   `env:"WORKERS_COUNT"`
+	CARootPath                       string                `env:"CA_ROOT_PATH"`
 	LLMSVSSettings                   LLMSVSSettings
 }
 
@@ -52,6 +53,7 @@ func NewConfig() *Config {
 		SaluteScope:                      "SALUTE_SPEECH_PERS",
 		RunWorkersInterval:               10 * time.Second,
 		ParallelTaskCnt:                  5,
+		CARootPath:                       "certs/russian_trusted_root_ca_pem.crt",
 		LLMSVCSettingsFile:               "llmsvcsettings.yaml",
 	}
 	err := godotenv.Load()
@@ -76,7 +78,6 @@ func NewConfig() *Config {
 
 	flag.StringVar(&cfg.GigaChatURL, "g-url", cfg.GigaChatURL, "gigachat url")
 	flag.StringVar(&cfg.GigaChatOAuthURL, "g-oauth-url", cfg.GigaChatOAuthURL, "gigachat oauth url")
-	//flag.StringVar(&cfg.GigaChatAuthKey, "g-oauth-key", "", "gigachat oauth authorization key")
 	flag.StringVar(&cfg.GigaChatScope, "g-scope", cfg.GigaChatScope, "gigachat scope")
 	flag.StringVar(&cfg.GigaChatModel, "g-model", cfg.GigaChatModel, "gigachat model")
 	var gigachatRefreshTokenBeforeExp int64 = int64(cfg.GigaOAuthRefreshTokenBeforeExp.Seconds())
@@ -84,11 +85,11 @@ func NewConfig() *Config {
 
 	flag.StringVar(&cfg.SaluteURL, "s-url", cfg.SaluteURL, "salute url")
 	flag.StringVar(&cfg.SaluteOAuthURL, "s-oauth-url", cfg.SaluteOAuthURL, "salute oauth url")
-	//flag.StringVar(&cfg.SaluteAuthKey, "s-oauth-key", "", "salute oauth authorization key")
 	flag.StringVar(&cfg.SaluteScope, "s-scope", cfg.SaluteScope, "salute scope")
 	var saluteRefreshTokenBeforeExp int64 = int64(cfg.SaluteOAuthRefreshTokenBeforeExp.Seconds())
 	flag.Int64Var(&saluteRefreshTokenBeforeExp, "s-token-upd-before", saluteRefreshTokenBeforeExp, "refresh token before it exipres time in sec")
 
+	flag.StringVar(&cfg.CARootPath, "ca-root-path", cfg.CARootPath, "CA root path")
 	flag.StringVar(&cfg.LLMSVCSettingsFile, "llm-cfg", cfg.LLMSVCSettingsFile, "llm service settings yaml file")
 
 	var httpTimeout int64 = int64(cfg.HTTPTimeout.Seconds())

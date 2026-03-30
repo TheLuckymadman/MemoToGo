@@ -82,5 +82,5 @@ func (h *Handler) OnGet(c telebot.Context) error {
 		}
 	}
 
-	return c.Send(resp)
+	return nil
 }

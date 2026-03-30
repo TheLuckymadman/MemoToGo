@@ -39,7 +39,10 @@ func run() error {
 	defer logger.Sync()
 
 	cfg := config.NewConfig()
-	deps := initGlobalDeps(logger, cfg)
+	deps, err := initGlobalDeps(logger, cfg)
+	if err != nil {
+		return err
+	}
 
 	pg, err := repository.NewPGStorage(cfg.DSN, cfg.DBInitMode, cfg.DBMigrationDir, deps)
 	if err != nil {
@@ -58,7 +61,7 @@ func run() error {
 	getMeeting := tool.NewGetMeeting(meetRepo, deps)
 	toolRegistry.Add(listMeeting)
 	toolRegistry.Add(getMeeting)
-	userState := llm.NewState(20, 5, deps)
+	userState := llm.NewState(30, 5, deps)
 	llmSvc := llm.NewLLMService(gigaAdapter, cfg.LLMSVSSettings.ChatAssitSystemPropmpt, deps, userState, toolRegistry, 5)
 
 	jobQueue := queue.NewQueue(5)
@@ -135,11 +138,14 @@ func run() error {
 	return nil
 }
 
-func initGlobalDeps(logger *zap.Logger, cfg *config.Config) *deps.Deps {
-	httpClient := client.NewHTTPClient(cfg.HTTPTimeout)
+func initGlobalDeps(logger *zap.Logger, cfg *config.Config) (*deps.Deps, error) {
+	httpClient, err := client.NewHTTPClient(cfg.HTTPTimeout, cfg.CARootPath)
+	if err != nil {
+		return nil, fmt.Errorf("http client: %w", err)
+	}
 	errMsg := "Hmm, it looks like something went wrong, but we are already aware of it and working on a fix"
 	deps := deps.NewDeps(logger, httpClient, errMsg)
-	return deps
+	return deps, nil
 }
 
 func initSalute(cfg *config.Config, deps *deps.Deps) *salute.SaluteAdapter {
